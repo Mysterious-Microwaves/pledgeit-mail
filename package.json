@@ -1,0 +1,36 @@
+{
+  "name": "pledgeit-mail",
+  "version": "1.0.0",
+  "description": "Mail Microservice for Pledgeit using Mailgun",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test",
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "pledge",
+    "it",
+    "mail",
+    "micro",
+    "service"
+  ],
+  "author": "Kriz Cortes",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "grunt": "^1.0.1",
+    "mailgun": "^0.5.0",
+    "mailgun-js": "^0.11.2",
+    "nodemon": "^1.11.0",
+    "path": "^0.12.7",
+    "redis": "^2.7.1"
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "grunt-mocha-test": "^0.13.2",
+    "mocha": "^3.4.2",
+    "supertest": "^3.0.0"
+  }
+}
