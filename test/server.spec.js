@@ -32,7 +32,7 @@ describe('basic server', function() {
       .expect(200) // should be 201 created
       .expect(function(res) {
         // expect(res.body.data).to.equal('Feed me!');
-        expect(res.text.).to.equal('Feed me!');
+        expect(res.text).to.equal('Feed me!');
       })
       .end(done);
   });

@@ -1,15 +1,18 @@
 {
   "name": "pledgeit-mail",
   "version": "1.0.0",
-  "description": "Mail Microservice for Pledgeit using Mailgun",
+  "description": "Mail Microservice Queue for Pledgeit using Redis and Mailgun",
   "main": "index.js",
   "scripts": {
     "test": "grunt test",
+    "testredis": "redis-server ./redis_test.conf",
+    "redis": "redis-server ./redis.conf",
     "start": "nodemon index.js"
   },
   "keywords": [
     "pledge",
     "it",
+    "queue",
     "mail",
     "micro",
     "service"
@@ -21,7 +24,6 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "grunt": "^1.0.1",
-    "mailgun": "^0.5.0",
     "mailgun-js": "^0.11.2",
     "nodemon": "^1.11.0",
     "path": "^0.12.7",
