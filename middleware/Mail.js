@@ -1,16 +1,16 @@
 'use strict';
 var mailgunApiKey = process.env.MAILGUN_API_KEY || require('../config/default.json')['MAILGUN_API_KEY'];
 var domain = process.env.MAILGUN_DOMAIN || require('../config/default.json')['MAILGUN_DOMAIN'];
+
 var mailgun = require('mailgun-js')({ apiKey: mailgunApiKey, domain: domain });
 var Promise = require('bluebird');
 
-module.exports.sendMail = function( item ) {
+module.exports.composeMail = function(item){
 
   var templates = {
     test: {
-      from: 'pay@emailgun.com',
-      subject: 'Your eMailgun Account Statement is Overdue!',
-      html: `Thank you for using our services Oliver Ullman! \n Your monthly account statement is over $${ item.amount }, please pay at our earliest convenience to the PayPal address kriz@krizcortes.com. We have a $69 late fee charge, so don't be lazy and make your payment today!`
+      subject: 'This Email is a Test',
+      html: `This is the html of the email!\nThe body should include the passed in data:\nto: ${ item.to }\ntype: ${ item.type }\namount: ${ item.amount }\n`
     },
 
     thanks_pledge: {
@@ -31,45 +31,19 @@ module.exports.sendMail = function( item ) {
   };
 
   var mail = {
-    from: templates[item.type].from || 'pledgeit@gmail.com',
-    to: 'oliverullman@gmail.com',
+    from: 'pledgeit@gmail.com',
+    to: item.to,
     subject: templates[item.type].subject,
     html: templates[item.type].html
   };
 
-  // console.log('COMPOSED', mail );
-  // return new Promise(function( resolve, reject ){
+  return mail;
+};
 
-    return mailgun.messages().send( mail )
+module.exports.sendMail = function( item ) {
 
-    //   , function( err, mail ){
-
-    //   return new Promise(function( res, rej ))
-    //   console.log("MAILGUN FUNCTION", err, mail );
-
-    //   if (err) {
-
-    //     console.log('mailgun error!', err);
-    //     // return Promise.resolve(err).then(function(err){
-    //       return false;
-    //     // });
-
-    //   } else {
-
-    //     console.log('mailgun success!', mail);
-    //     // return Promise.resolve(mail).then(function(mail){
-    //       return true;
-    //     // });
-    //   }
-
-    // })
-
-    .then(function( sent ){
-
-      return !!sent.id;
-    });
-
-  // });
-
-
+  var mail = module.exports.composeMail( item );
+  return mailgun.messages().send( mail ).then(function( sent ){
+    return !!sent.id;
+  });
 };

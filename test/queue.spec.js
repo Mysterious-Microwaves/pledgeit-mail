@@ -13,7 +13,7 @@ var Redis = middleware.redis.createClient(7357, '127.0.0.1');
 var Q = new middleware.Q(Redis);
 
 var testEntry = JSON.stringify({ 
-      to: 'test@email.com',
+      to: 'oliverullman@gmail.com',
       type: 'test',
       amount: '9000'
     });
@@ -257,64 +257,7 @@ describe('The Red Queue', function() {
 
   });
 
-  xdescribe( 'Mail Gun', function() {
-
-    // sends mail,
-    // how could we test this?
-    // return value?
-
-  });
-
-  xdescribe('Cron Worker', function() {
-
-    // exists and initiates
-    // fetches email every x amount of time
-    // measure size
-    // test with timers
-
-  });
-
-
-
 });
 
-
-  
-
-
-
-// -- test for redis data storage and retrieval
-// -- test for FIFO queue system ( push and pop )
-// -- test for receiving entry to queue and entering it
-// -- test for worker to have interval
-// -- test for worker ( cronJob? ) to consume redis
-// -- test for snapshot of redis queue before cronJobbing
-// -- test for snapshot after redis consumption
-// -- test executing entry job ( compose corresponding email )
-// -- test for sending corresponding email
-// -- test for receiving confirmation of sent email
-// -- test for catching failed email attempt to send
-// -- test for adding to a different queue of reattempts
-// -- test for re-attempting 20? more times until it stops
-// -- test for after it stops attempting, sends info to pledgeit
-
-  // it('denies access to any other route', function(done) {
-  //   request(app)
-  //     .get('/any')
-  //     .expect(200)
-  //     .expect(function(res) {
-  //       expect(res.text).to.equal('Where you going bro?');
-  //     })
-  //     .end(done);
-  // });
-
-  // it('accepts POST request', function(done) {
-  //   request(app)
-  //     .post('/mail')
-  //     .expect(200) // should be 201 created
-  //     .expect(function(res) {
-  //       // expect(res.body.data).to.equal('Feed me!');
-  //       expect(res.text.).to.equal('Feed me!');
-  //     })
-  //     .end(done);
-  // });
+// -- adds mail to a different queue of reattempts on send fail
+  //  ( this might not be needed here, possible mailgun option )

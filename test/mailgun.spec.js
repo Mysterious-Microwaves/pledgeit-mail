@@ -5,27 +5,30 @@ const expect = require('chai').expect;
 const app = require('../app.js');
 var middleware = require('../middleware');
 
-
-// Instantiate Redis
-// var Redis = middleware.redis.createClient(7357, '127.0.0.1');
-
-// // Instantiate Queue
-// var Q = new middleware.Q(Redis);
-
 var testEntry = JSON.stringify({ 
-      to: 'test@email.com',
+      to: 'oliverullman@gmail.com',
       type: 'test',
       amount: '9000'
     });
 
 var Mail = middleware.Mail;
 
-xdescribe('Mailgun Service', function() {
-
-  describe('Instantiation', function(){
+describe('Mailgun Service', function() {
     
-    it('instantiates Mailgun', function(done) {
-      expect( Redis ).to.be.an('object');      
+  it('composes mail with item data + template', function(done) {
+
+    var mail = Mail.composeMail( JSON.parse(testEntry) );
+    expect( mail ).to.have.property('to','oliverullman@gmail.com');
+    expect( mail ).to.not.have.property('type');
+    expect( mail ).to.not.have.property('amount');
+    done();
+    
+  });
+
+  it('sends mail to address', function(done) {
+
+    Mail.sendMail( JSON.parse(testEntry) ).then(function(sent){
+      expect( sent ).to.equal( true );
       done();
     });
 

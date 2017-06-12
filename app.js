@@ -3,11 +3,9 @@ var app = require('express')();
 var path = require('path');
 var middleware = require('./middleware');
 
-// 
 app.use(middleware.bodyParser.urlencoded({ extended: true }));
 app.use(middleware.bodyParser.json());
 app.use(middleware.bodyParser({ limit: '50mb' }));
-
 
 // Redis configurated with 'appendonly' mode yes 
 // for data persistence and rebuild on suddent stop / crash
@@ -19,38 +17,38 @@ Redis.on('connect', function() {
 // Initialize Queue with Redis Instance
 var Q = new middleware.Q(Redis);
 
-// .POST MAIL QUEUE ENTRY/TASK
+// add task to queue
 app.post('/mail', function(req,res){
-  // => will receive a JSON with email data and add it to the queue
-  // expects the req.body to have auth key to confirm comes from pledgeit
-  // if req.body.auth === expected
-  // Q.add(req.body); 
-  res.send('Feed me!');
+
+  /* expects { 
+      auth: hash,             // required!
+      to: email,              // required! 
+      type: 'thanks_pledge',  // required!
+      amount: amount,         // required!
+      venmoid: username       // optional
+    } 
+  */
+  var newtask = JSON.stringify(req.body);
+
+  Q.add( newtask ).then(function( response ){
+    res.send( response );
+  }); 
 });
 
-
-// We won't be using GET
-app.get('/mail', function(req,res){
-  res.send('You\'ve got mail!');
-});
-
-
-// DEFAULT for all unrecognized calls,
+var pledgeit = 'http://pledgeit-staging.herokuapp.com';
+// Redirect on all other requests
 app.use('*', function(req, res){
-  // pldegeit-mail/* ( serve error page, image )
-  res.send("Where you going bro?");
+  res.redirect( pledgeit );
 });
+
+module.exports = app;
+
+
 
 
 // WORKER
 // every minute it will go through the queue 
 // and execute the tasks in it
-
-
-// TEMPLATES 
-// will be the templates to fill up and send 
-// could be ejs
-
 
 // x // DATABASE ( REDIS APPENDONLY )
 // redis is persisting data automatically using appendonly true
@@ -69,5 +67,3 @@ app.use('*', function(req, res){
 
 // default dev-mode config files,
 // ignored on .gitignore
-
-module.exports = app;
