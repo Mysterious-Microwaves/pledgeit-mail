@@ -14,7 +14,7 @@ var Q = new middleware.Q(Redis);
 
 var testEntry = JSON.stringify({ 
       to: 'test@email.com',
-      type: 'mail',
+      type: 'test',
       amount: '9000'
     });
 

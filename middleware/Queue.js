@@ -1,5 +1,5 @@
 'use strict';
-
+var Mail = require('./Mail');
 var Promise = require('bluebird');
 
 function Queue(red){
@@ -11,13 +11,15 @@ function Queue(red){
 };
 
 // returns [ key, data ]
-Queue.prototype.get = function(table, key){
+Queue.prototype.get = function( table, key ){
+
   return this.Red.hgetAsync( table, key ).then(function(data){
     return [ key, JSON.parse(data) ];
   });
 };
  
 Queue.prototype.size = function(){
+
   // return size of the queue
   return this.Red.llenAsync( this.queue )
   .then( function(size) {
@@ -29,34 +31,25 @@ Queue.prototype.size = function(){
   });
 };
 
-Queue.prototype.add = function(item){
+Queue.prototype.add = function( item ){
 
   var Q = this;
 
   return Q.size()
   .then(function(size){
 
-    // create keyname with count
+    // create keyname based on queue size
     var key = 'm'+size;
-    
-    // increase counter
-    // return Q.Red.incrAsync( Q.counter )
-    // .then(function(counter){
       
       // push item to end of Queue
       return Q.Red.rpushAsync( Q.queue, key )
       .then(function(queue_res){
 
-        // console.log("PUSH",key,item);
-
-        // save item in our storage { key: item }
+        // save item in storage { key: item }
         return Q.Red.hmsetAsync( Q.mail, key, item )
         .then(function(hash_res){
 
-          return {
-            key: key,
-            saved: hash_res
-          }
+          return { key: key, saved: hash_res }
 
       });
     });
@@ -104,26 +97,23 @@ Queue.prototype.do = function(){
   });
 };
 
-Queue.prototype.doGroup = function(amount){
+Queue.prototype.doGroup = function( amount ){
 
   var Q = this;
 
   // given amount or all
-  return Promise.resolve(amount).then(function(amount){
+  return Promise.resolve( amount ).then(function( amount ){
     
-    if ( amount === undefined ){
-      amount = Q.size();
-    }
-    return amount;
+    return ( amount !== undefined ) ? amount : Q.size();
 
-  }).then(function(amount){
+  }).then(function( amount ){
 
-    return new Promise( function(resolve, reject){
+    return new Promise(function( resolve, reject ){
 
-      var error = null;
-      while ( amount > 0 && error === null ){
+      var error;
+      while ( amount > 0 && error === undefined ){
 
-        Q.do().then(function(result){
+        Q.do().then(function( result ){
           if ( !result.sent || !result.deleted ){
             error = result;
           }
@@ -135,93 +125,9 @@ Queue.prototype.doGroup = function(amount){
   });
 };
  
-// to-do ( use mailGun );
-Queue.prototype.sendMail = function(item){
+Queue.prototype.sendMail = function( item ){
 
-  var Q = this;
-
-  return new Promise(function(resolve, reject){
-    // console.log("SENDING MAIL ", item);
-    // which calls the mail building function using item
-    // that calls the sending function 
-    resolve(true);
-  });
+  return Mail.sendMail( item[1] );
 };
 
 module.exports = Queue;
-
-// Queue.prototype.getRange = function(amount){
-  
-//   var Q = this;
-
-//   // given amount or all
-//   if ( !amount ){
-//     amount = Q.size();
-//     console.log("getting range of ",amount);
-//   }
-
-//   return Q.Red.lrangeAsync( Q.queue, 0, amount ).then(function(range){
-//     return eachAsync( range, function(item){
-//       return Q.getItem( Q.mail, item );
-//     });
-//   });
-// };
-
-
-// Queue.prototype.doRange = function(amount){
-//   var Q = this;
-//   return Q.getRange(amount).then(function(range){
-//     // process 
-//     return Q.sendGroupMail(range).then(function(groupSent){
-//       // delete from db
-//       return Q.deleteGroup(range).then(function(deletedGroupDb){
-//         // delete from queue
-
-//       });
-//     });
-//   });
-// };
-
-// Queue.prototype.deleteGroup = function(range){
-//   return eachAsync( range, function(item){
-//     return Q.delete( Q[item[1].type], item[0] );
-//   });
-// };
-
-
-// Queue.prototype.sendGroupMail = function(group){
-
-//   return eachAsync( group, Q.sendMail );
-// };
-
-// new Promise(function(resolve, reject){
-  // do something cool
-// });
-
-// QUEUE is a redis-cache,
-// save queue snapshot before and after every worker execution
-// if it crashes, we don't loose queue ( rebuild from snapshot )
-// snapshot === file?
-
-// Redis Hash ( storage )
-
-  //    add | HMSET hashName field1 value1 field2 value2 ( JSON VALUES )
-  //    get | HGET hashName field1
-  // delete | HDEL hashName field1 
-
-//  Redis Lists ( queue )
-
-  //  RPUSH | add to end 
-  //   LPOP | remove and get the first element
-  // LRANGE | retrieve a group of elements from x to z
-  //  LTRIM | trim a list to the specified range
-  //   LLEN | size of a list
-
-// Redis String ( counter )
-
-  // APPEND | appends value to a key
-  //   INCR | increase the integer value of a key by 1
-  //   DECR | decrements the integer value of a key by 1
-  // DECRBY | decrements the integer value of a key by given number
-  //    GET | get the value of a key
-

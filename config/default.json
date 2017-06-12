@@ -1,0 +1,13 @@
+{
+  "MAILGUN_API_KEY": "key-5e1c2c572ce45fd3906d7076f73dafd5",
+
+  "MAILGUN_DOMAIN": "app6c1a0a55aa424d598a928f85c41e4781.mailgun.org",
+
+  "S3_ACCESS_KEY": "AKIAJY3COX3O4YEIAEPA",
+
+  "S3_SECRET_KEY": "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",
+
+  "S3_BUCKET": "mysterious-microwaves-images",
+  
+  "S3_REGION": "us-west-2"
+}
