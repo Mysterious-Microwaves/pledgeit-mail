@@ -1,39 +1,35 @@
 'use strict';
-const request = require('supertest');
-const express = require('express');
-const expect = require('chai').expect;
-const app = require('../app.js');
+var request = require('supertest');
+var express = require('express');
+var expect = require('chai').expect;
+var app = require('../app.js');
 var middleware = require('../middleware');
+var testing = require('./test_instances');
 
-
-// Instantiate Redis
-var Redis = middleware.redis.createClient(7357, '127.0.0.1');
-
-// Instantiate Queue
-var Q = new middleware.Q(Redis);
-
-var testEntry = JSON.stringify({ 
-      to: 'oliverullman@gmail.com',
-      type: 'test',
-      amount: '9000'
-    });
-
-// Flush test db
-var flush = function(){
-
-  Q.Red.flushdb();
-};
+// // Get Q With Redis
+var Redis = testing.Redis;
+var Q = testing.Q;
 
 describe('The Red Queue', function() {
 
+  beforeEach(function(done) {
+    testing.flush();
+    done();
+  });
+
+  afterEach(function(done) {
+    testing.flush();
+    done();
+  });
+
   describe('Instantiation', function(){
     
-    it('instantiates Redis', function(done) {
-      expect( Redis ).to.be.an('object');      
+    it('imports Redis', function(done) {
+      expect( Redis ).to.be.an('object');   
       done();
     });
 
-    it('imports Queue middleware', function(done) {
+    it('imports Queue', function(done) {
       expect( middleware.Q ).to.be.a('function');
       done();
     });
@@ -49,16 +45,31 @@ describe('The Red Queue', function() {
 
   });
 
-  describe('Helper Functions', function() {
+  describe('Queue Functions', function() {
 
-      it('returns the size of the queue', function(done) {
-
-        flush();
+      it('size: returns the size of the queue', function(done) {
 
         Q.size().then(function(size){
           expect(size).to.equal(0);
           done();
         });
+      });
+
+      it('get: retrieves and removes next key', function(done) {
+
+        Q.add( testing.testEntry ).then(function(){
+          Q.size().then(function(size1){
+            expect( size1 ).to.equal(1);
+            Q.next().then(function(key){
+              expect( key ).to.equal('m0');
+              Q.size().then(function(size2){
+                expect( size2 ).to.equal(0);
+                done();
+              });
+            });
+          });
+        })
+
       });
 
   });
@@ -67,11 +78,9 @@ describe('The Red Queue', function() {
 
     it('assigns key name based on counter', function(done) {
 
-      flush();
-
       Q.size().then(function(initSize){
 
-        Q.add( testEntry ).then(function(response){
+        Q.add( testing.testEntry ).then(function(response){
 
           expect( response ).to.have.property('key','m'+initSize);
           done();
@@ -81,14 +90,13 @@ describe('The Red Queue', function() {
 
     it('adds key to queue list', function(done) {
 
-      flush();
-
       Q.size().then(function(initSize){
 
-        Q.add( testEntry ).then(function(response){
+        Q.add( testing.testEntry ).then(function(response){
 
-          Q.size(function(size){ expect( size ).to.equal( initSize + 1 ) });
-          // get last item ( only item ) in query and compare === keyname
+          Q.size(function(size){ 
+            expect( size ).to.equal( initSize + 1 ) 
+          });
           done();
         });
       });
@@ -96,15 +104,13 @@ describe('The Red Queue', function() {
 
     it('saves item to mail hash', function(done) {
 
-      flush();
-
-      Q.add( testEntry ).then(function(response){
+      Q.add( testing.testEntry ).then(function(response){
 
         Q.get( Q.mail, response.key ).then(function(item){
 
           expect( response ).to.have.property('saved', 'OK');
           expect( item[0] ).to.equal( response.key );
-          expect( item[1] ).to.deep.equal( JSON.parse(testEntry) );
+          expect( item[1] ).to.deep.equal( JSON.parse(testing.testEntry) );
           done();
         });
       });
@@ -117,14 +123,12 @@ describe('The Red Queue', function() {
     it('removes item from queue, storage and counter when processing it', 
       function(done) {
 
-      flush();
-
-      Q.add( testEntry ).then(function(add_response){
+      Q.add( testing.testEntry ).then(function(add_response){
         Q.get( Q.mail, add_response.key ).then(function(item){
 
           expect( add_response ).to.have.property('saved', 'OK');
           expect( item[0] ).to.equal( add_response.key );
-          expect( item[1] ).to.deep.equal( JSON.parse(testEntry) );
+          expect( item[1] ).to.deep.equal( JSON.parse(testing.testEntry) );
 
           Q.size().then(function(size){ 
             expect(size).to.equal( 1 ); 
@@ -153,22 +157,20 @@ describe('The Red Queue', function() {
 
     it('gets and removes next passed in number of items from queue', function(done) {
 
-      flush();
-
       var test_entries = [];
 
       // add first
-      Q.add( testEntry ).then(function(add_response1){
+      Q.add( testing.testEntry ).then(function(add_response1){
 
         test_entries.push(add_response1);
 
         // add second
-        Q.add( testEntry ).then(function(add_response2){
+        Q.add( testing.testEntry ).then(function(add_response2){
 
           test_entries.push(add_response2);
 
           // add third
-          Q.add( testEntry ).then(function(add_response3){
+          Q.add( testing.testEntry ).then(function(add_response3){
           
             test_entries.push(add_response3);
 
@@ -205,22 +207,20 @@ describe('The Red Queue', function() {
 
     it('gets and removes all items from queue if no amount passed in', function(done) {
 
-      flush();
-
       var test_entries = [];
 
       // add first
-      Q.add( testEntry ).then(function(add_response1){
+      Q.add( testing.testEntry ).then(function(add_response1){
 
         test_entries.push(add_response1);
 
         // add second
-        Q.add( testEntry ).then(function(add_response2){
+        Q.add( testing.testEntry ).then(function(add_response2){
 
           test_entries.push(add_response2);
 
           // add third
-          Q.add( testEntry ).then(function(add_response3){
+          Q.add( testing.testEntry ).then(function(add_response3){
           
             test_entries.push(add_response3);
 
@@ -245,16 +245,14 @@ describe('The Red Queue', function() {
               // size is 0
               Q.size().then(function(size){
                 expect(size).to.equal(0);
+                done();
               });
-
-              done();
-
             });
           });
         });
       });
-    });
 
+    });
   });
 
 });

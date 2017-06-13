@@ -14,6 +14,7 @@ function Queue(red){
 Queue.prototype.get = function( table, key ){
 
   return this.Red.hgetAsync( table, key ).then(function(data){
+
     return [ key, JSON.parse(data) ];
   });
 };
@@ -21,12 +22,12 @@ Queue.prototype.get = function( table, key ){
 Queue.prototype.size = function(){
 
   // return size of the queue
-  return this.Red.llenAsync( this.queue )
-  .then( function(size) {
+  return this.Red.llenAsync( this.queue ).then( function(size) {
+
     return size; 
-  })
-  .catch(function(err){
-    console.log("Error getting size of queue", err);
+
+  }).catch(function(err){
+
     return err;
   });
 };
@@ -84,10 +85,15 @@ Queue.prototype.do = function(){
         if ( sent ){
           // delete item from db
           return Q.delete( Q.mail, key ).then(function( deleted ){
-            return { key: key, item: item, sent: sent, deleted: deleted };
+
+            var result = { key: key, item: item, sent: sent, deleted: deleted };
+            console.log("DONE:",key, JSON.stringify(result));
+            return result;
           });
 
         } else {
+
+          console.log("NOT SENT", key, sent );
           // return err array for now,
           // ************************* to-do add to re-attempts queue
           return { key: key, item: item, sent: sent }
@@ -122,6 +128,7 @@ Queue.prototype.doGroup = function( amount ){
       }
       (error) ? reject(error) : resolve(true);
     });
+
   });
 };
  

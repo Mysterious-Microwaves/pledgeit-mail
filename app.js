@@ -2,13 +2,14 @@
 var app = require('express')();
 var path = require('path');
 var middleware = require('./middleware');
+var pledgeitUrl = 'http://pledgeit-staging.herokuapp.com';
 
 app.use(middleware.bodyParser.urlencoded({ extended: true }));
 app.use(middleware.bodyParser.json());
 app.use(middleware.bodyParser({ limit: '50mb' }));
 
-// Redis configurated with 'appendonly' mode yes 
-// for data persistence and rebuild on suddent stop / crash
+// Redis configurated with appendonly: yes 
+// for data persistence and rebuild on spin up
 var Redis = middleware.redis.createClient(1337, '127.0.0.1');
 Redis.on('connect', function() {
   console.log("Redis connected!");
@@ -17,33 +18,43 @@ Redis.on('connect', function() {
 // Initialize Queue with Redis Instance
 var Q = new middleware.Q(Redis);
 
+// Q.Red.flushdb();
+// Q.size().then(function(size){ console.log('STARTING WITH ',size)})
+
 // add task to queue
 app.post('/mail', function(req,res){
-
   /* expects { 
       auth: hash,             // required!
       to: email,              // required! 
       type: 'thanks_pledge',  // required!
       amount: amount,         // required!
       venmoid: username       // optional
-    } 
-  */
+  } */
   var newtask = JSON.stringify(req.body);
-
+  // console.log("ADD", newtask);
   Q.add( newtask ).then(function( response ){
     res.send( response );
   }); 
 });
 
-var pledgeit = 'http://pledgeit-staging.herokuapp.com';
 // Redirect on all other requests
 app.use('*', function(req, res){
-  res.redirect( pledgeit );
+  res.redirect( pledgeitUrl );
+});
+
+// Go through all tasks every minute
+var crontime = 0;
+middleware.cron.schedule('*/5 * * * * *', function(){
+  crontime += 5;
+  console.log('[ %s ] Going through Queue every 5 seconds', crontime);
+  Q.size().then(function(size){
+    if ( size > 0 ){
+      Q.doGroup();
+    }
+  });
 });
 
 module.exports = app;
-
-
 
 
 // WORKER

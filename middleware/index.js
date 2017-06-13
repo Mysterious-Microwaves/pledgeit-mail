@@ -17,3 +17,5 @@ module.exports.Mail = require('./Mail');
 
 module.exports.bodyParser = require('body-parser');
 
+module.exports.cron = require('node-cron');
+
