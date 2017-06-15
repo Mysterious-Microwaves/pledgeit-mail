@@ -10,7 +10,12 @@ app.use(middleware.bodyParser({ limit: '50mb' }));
 
 // Redis configurated with appendonly: yes 
 // for data persistence and rebuild on spin up
-var Redis = middleware.redis.createClient(1337, '127.0.0.1');
+var redClientAddress = process.env.REDIS_URL || '127.0.0.1';
+console.log("\n\nREDCLIENTADDR",redClientAddress);
+
+var Redis = middleware.redis.createClient( redClientAddress );
+// var Redis = middleware.redis.createClient( 1337, redClientAddress );
+
 Redis.on('connect', function() {
   console.log("Redis connected!");
 });
@@ -28,7 +33,7 @@ app.post('/mail', function(req,res){
       to: email,              // required! 
       type: 'thanks_pledge',  // required!
       amount: amount,         // required!
-      venmoid: username       // optional
+      venmo: username       // optional
   } */
   var newtask = JSON.stringify(req.body);
   // console.log("ADD", newtask);

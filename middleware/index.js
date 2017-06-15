@@ -1,15 +1,11 @@
-// module.exports.auth = require('./auth');
-// module.exports.passport = require('./passport');
-// module.exports.morgan = require('morgan');
-// module.exports.flash = require('connect-flash');
-// module.exports.cookieParser = require('cookie-parser');
-// var Path = require('path');
 
 var Bluebird = require('bluebird');
 
 module.exports.Bluebird = Bluebird;
 
-module.exports.redis = Bluebird.promisifyAll(require('redis'));
+var red = require('redis');
+
+module.exports.redis = Bluebird.promisifyAll(red);
 
 module.exports.Q = require('./Queue');
 

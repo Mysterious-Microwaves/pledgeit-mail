@@ -52,11 +52,12 @@ module.exports.composeMail = function(item){
 
     goal_reached: {
       subject: `${item.project} reached it's goal!`,
-      html: `Thanks to awesome people like you, ${item.project} reached it's goal!\n Thank you for your commitment to help and change the world around us.\n Pleaes follow the link to complete your pledge through the organization's venmo account.\n\n Thank you for making ${item.project} a reality, Keep being awesome!\n\n<h3>${ module.exports.create_venmo(item) }</h3>`
+      html: `Thanks to awesome people like you, ${item.project} reached it's goal!\n Thank you for your commitment to help and change the world around us.\n Please follow the link to complete your pledge through the organization's venmo account.\n\n Thank you for making ${item.project} a reality, Keep being awesome!\n\n<h3>${ module.exports.create_venmo(item) }</h3>`
     },
 
     project_expired: {
-
+      subject: `${item.project} did not reach it's goal in time.`,
+      html: `We thank you for pledging to ${item.project}! \n Unfortunately, the project did not reach it's funding goal in time.\n You're always invited to visit us again and look at all the other open projects you could be a part of to make our world a better one for all of us! \n Stay awesome!`
     }
   };
 

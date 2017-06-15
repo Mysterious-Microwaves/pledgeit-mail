@@ -21,7 +21,7 @@ describe('Mailgun Service', function() {
   });
 
   it('sends mail to address', function(done) {
-    this.timeout(3000);
+    this.timeout(5000);
     Mail.sendMail( JSON.parse( testing.testEntry) ).then(function(sent){
       expect( sent ).to.equal( true );
       done();

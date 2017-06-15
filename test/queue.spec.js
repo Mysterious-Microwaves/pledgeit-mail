@@ -120,6 +120,8 @@ describe('The Red Queue', function() {
 
   describe('Process Next Item in Queue', function() {
 
+    this.timeout(5000);
+    
     it('removes item from queue, storage and counter when processing it', 
       function(done) {
 
