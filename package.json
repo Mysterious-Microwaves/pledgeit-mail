@@ -7,7 +7,7 @@
     "test": "grunt test",
     "testredis": "redis-server ./redis_test.conf",
     "redis": "redis-server ./redis.conf",
-    "start": "nodemon index.js"
+    "start": "npm install && nodemon index.js"
   },
   "keywords": [
     "pledge",
