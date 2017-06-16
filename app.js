@@ -13,7 +13,7 @@ app.use(middleware.bodyParser({ limit: '50mb' }));
 var redClientAddress = process.env.REDIS_URL || '127.0.0.1';
 console.log("\n\nREDCLIENTADDR",redClientAddress);
 
-var Redis = middleware.redis.createClient( redClientAddress );
+var Redis = middleware.redis.createClient({ host: redClientAddress });
 // var Redis = middleware.redis.createClient( 1337, redClientAddress );
 
 Redis.on('connect', function() {
