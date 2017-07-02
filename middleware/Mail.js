@@ -30,7 +30,6 @@ module.exports.create_venmo = function(data){
     return arr;
   },[]).join('&');
 
-  // console.log("VENMOLINK", venmolink);
   return venmolink;
 };
 

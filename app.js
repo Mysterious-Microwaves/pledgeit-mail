@@ -11,10 +11,7 @@ app.use(middleware.bodyParser({ limit: '50mb' }));
 // Redis configurated with appendonly: yes 
 // for data persistence and rebuild on spin up
 var redClientAddress = process.env.REDIS_URL || '127.0.0.1';
-console.log("\n\nREDCLIENTADDR",redClientAddress);
-
 var Redis = middleware.redis.createClient({ host: redClientAddress });
-// var Redis = middleware.redis.createClient( 1337, redClientAddress );
 
 Redis.on('connect', function() {
   console.log("Redis connected!");
@@ -23,20 +20,20 @@ Redis.on('connect', function() {
 // Initialize Queue with Redis Instance
 var Q = new middleware.Q(Redis);
 
-// Q.Red.flushdb();
-// Q.size().then(function(size){ console.log('STARTING WITH ',size)})
-
-// add task to queue
-app.post('/mail', function(req,res){
-  /* expects { 
-      auth: hash,             // required!
+/* 
+  add task to queue
+  expects { 
       to: email,              // required! 
       type: 'thanks_pledge',  // required!
       amount: amount,         // required!
       venmo: username       // optional
-  } */
+  } 
+*/
+
+app.post('/mail', function(req,res){
+
   var newtask = JSON.stringify(req.body);
-  // console.log("ADD", newtask);
+
   Q.add( newtask ).then(function( response ){
     res.send( response );
   }); 
@@ -60,26 +57,3 @@ middleware.cron.schedule('*/5 * * * * *', function(){
 });
 
 module.exports = app;
-
-
-// WORKER
-// every minute it will go through the queue 
-// and execute the tasks in it
-
-// x // DATABASE ( REDIS APPENDONLY )
-// redis is persisting data automatically using appendonly true
-// it saves and rebuilds automatically
-
-
-// AUTHENTICATE 
-// the request is coming from the verified client
-// perhaps have request object come with an auth key or hash
-// and compare against it
-
-
-// VENMO LINKS ( in template )
-// manipulate links, make them as url to btn
-
-
-// default dev-mode config files,
-// ignored on .gitignore
