@@ -1,5 +1,11 @@
-Mail micro-service using Mailgun.
+# PLEDGEIT-MAIL
 
-Built for pledgeit project,
+### Queue micro-service 
+### for multiple email notifications 
+### using Redis and Mailgun.
 
-by Kriz Cortés @sirkortes
+##### Built for [PLEDGEIT](https://goo.gl/CTp2vQ)
+
+** Kriz Cortés ** 
+[@sirkortes](https://github.com/sirkortes)
+[hire@krizcortes.com](mailto:hire@krizcortes.com)
